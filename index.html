@@ -252,16 +252,16 @@
         }
 
         tick() {
-            if(this.direction=='UP' && this.ypos<height){
+            if(this.direction=='UP' && this.ypos>0){
                 this.ypos -=1;
                 return true;
-            }else if (this.direction=='DOWN' && this.ypos>-1){
+            }else if (this.direction=='DOWN' && this.ypos<height){
                 this.ypos +=1;
                 return true;
             }else if (this.direction=='RIGHT' && this.xpos<width){
                 this.xpos +=1;
                 return true;
-            }else if (this.direction=='LEFT'  && this.xpos>-1){
+            }else if (this.direction=='LEFT'  && this.xpos>0){
                 this.xpos -=1;
                 return true;
             }else{
@@ -296,6 +296,7 @@
                 }
             }
         )
+        console.log(returnArray)
         return returnArray
     }
     function arraysEqual(a, b) {
@@ -341,7 +342,7 @@
                 if(bullet.id!=element.id){
                     args.MissileIncomings.push({XDIST: bullet.xpos-element.xpos,YDIST:bullet.ypos-element.ypos,DIR:bullet.direction });
                 }
-                }    
+                }
         )
         botArrayUpdated.forEach(
             function(bot) {
