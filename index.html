@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <script src="https://cdn.jsdelivr.net/ace/1.2.4/min/ace.js"></script>
+    <link rel="stylesheet" href="index.css" />
 
 </head>
 <body>
@@ -21,15 +22,13 @@
 
 
         <div class="editor" id="worker1" type="javascript/worker">
-            self.onmessage = function(e) {
-                var data = e.data;
-                if (data.action === "execute") {
-                    //var result = lafonctiondumec(e.argument);
-                    action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
-                    var result=action[Math.floor(Math.random() *5)]
-                    self.postMessage({ action: "result", result: result });
-                }
-            };
+
+function main(arg){
+    action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
+    var result=action[Math.floor(Math.random() *5)]
+    return result
+}
+
         </div>
         <div  id="zone" >
         </div>
@@ -38,15 +37,13 @@
 
 
     <textarea id="random"  type="javascript/worker" style="visibility:hidden;">
-    self.onmessage = function(e) {
-        var data = e.data;
-        if (data.action === "execute") {
-            //var result = lafonctiondumec(e.argument);
-            action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
-            var result=action[Math.floor(Math.random() *5)]
-            self.postMessage({ action: "result", result: result });
-        }
-    };
+
+function main(arg){
+    action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
+    var result=action[Math.floor(Math.random() *5)]
+    return result
+}
+
     </textarea>
 
 
@@ -63,17 +60,8 @@
     var editor = ace.edit("worker1");
     editor.setTheme("ace/theme/monokai");
     editor.getSession().setMode("ace/mode/javascript");
+    var TimeOut;
 
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
-    width=20;
-    height=20;
-    var caseScale=20;
-    var background = new Image();
-    background.src = "./src/back.png";
-    canvas.width = width*caseScale;
-    canvas.height = height*caseScale;
-    document.getElementById("zone").appendChild(canvas);
 
     function compareBot(a, b) {
         if (a.dead && b.dead){
@@ -99,7 +87,13 @@
             this.id =  Math.random().toString(36).substr(2, 10);;
             this.bullets = bullets;
             this.dead=false;
-            var blob = new Blob([value]);
+            var blob = new Blob(["self.onmessage = function(e) { \
+                                        var data = e.data;\
+                                        "+value+"if (data.action === 'execute') {\
+                                                    var result = main(data.argument);\
+                                                    self.postMessage({ action: 'result', result: result });\
+                                                }\
+                                            };"]);
             this.url=window.URL.createObjectURL(blob)
             this.worker = new Worker(this.url);
             this.orientation="UP";
@@ -124,7 +118,7 @@
             }
         }
 
-        draw(over){
+        draw(over,ctx,caseScale){
             var inc=0;
             if(over==true){
                 inc=5;
@@ -231,7 +225,7 @@
             this.image=image;
         }
 
-        draw(){
+        draw(ctx,caseScale){
             if(this.direction=="UP"){
             ctx.drawImage(this.image[0], this.xpos*caseScale-caseScale, this.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
             }
@@ -296,7 +290,6 @@
                 }
             }
         )
-        console.log(returnArray)
         return returnArray
     }
     function arraysEqual(a, b) {
@@ -327,7 +320,7 @@
 
     function constructArgs(element,botArrayUpdated,bulletArrayUpdated){
         var args={
-            MissileIncomings:[],
+            Missiles:[],
             Ennemies:[],
             Data:{
                 BULLETS: element.bullets,
@@ -340,7 +333,7 @@
         bulletArrayUpdated.forEach(
             function(bullet) {
                 if(bullet.id!=element.id){
-                    args.MissileIncomings.push({XDIST: bullet.xpos-element.xpos,YDIST:bullet.ypos-element.ypos,DIR:bullet.direction });
+                    args.Missiles.push({XDIST: bullet.xpos-element.xpos,YDIST:bullet.ypos-element.ypos,DIR:bullet.direction });
                 }
                 }
         )
@@ -355,7 +348,7 @@
         return args;
     }
 
-    function runTick(botArray,bulletArray,scoreBoard,resultBoard,overName){
+    function runTick(botArray,bulletArray,scoreBoard,resultBoard,overName,ctx,background,caseScale){
         //DO IT multiple time for speed
 
 
@@ -435,9 +428,9 @@
 
 
                     if(element.name==overName){
-                    element.draw(true);}
+                    element.draw(true,ctx,caseScale);}
                     else{
-                    element.draw(false);
+                    element.draw(false,ctx,caseScale);
                     }
                     if(!element.dead){
                         BulletsLeft+=element.bullets
@@ -453,7 +446,7 @@
             bulletArrayUpdated.forEach(
                 function(element) {
 
-                    element.draw();
+                    element.draw(ctx,caseScale);
 
                 }
             )
@@ -461,8 +454,8 @@
             if(BulletsLeft>0 && ContestantLeft>1){
                 document.getElementById(resultBoard).innerHTML="ongoing"
 
-            setTimeout(function() {
-                requestAnimationFrame(runTick.bind(null, botArrayUpdated, bulletArrayUpdated,scoreBoard,resultBoard,overName));
+            TimeOut=setTimeout(function() {
+                requestAnimationFrame(runTick.bind(null, botArrayUpdated, bulletArrayUpdated,scoreBoard,resultBoard,overName,ctx,background,caseScale));
             }, 1000 / 9);
 
             }else{
@@ -479,9 +472,26 @@
 
 
 //TEST
+
     function start(){
-        game=initGame(width, height, 100, [editor.getValue(),document.querySelector("#random").value,document.querySelector("#random").value,document.querySelector("#random").value],["user","random","random2","random3"])
-        runTick(game[0],game[1],"score","result","user");
+         startGame("zone",[editor.getValue(),document.querySelector("#random").value,document.querySelector("#random").value,document.querySelector("#random").value],["user","random","random2","random3"],"score","result");
+    }
+    function startGame(zone,codeArray,nameArray,score,result){
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        width=20;
+        height=20;
+        var caseScale=20;
+        var background = new Image();
+        background.src = "./src/back.png";
+        canvas.width = width*caseScale;
+        canvas.height = height*caseScale;
+        DrawZone=document.getElementById(zone)
+        DrawZone.removeChild(DrawZone.firstChild);
+        DrawZone.appendChild(canvas);
+        clearTimeout(TimeOut);
+        game=initGame(width, height, 100, codeArray,nameArray)
+        runTick(game[0],game[1],score,result,nameArray[0],ctx,background,caseScale);
     }
 
 

@@ -1,0 +1,315 @@
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="index.css" type="text/css">
+    <script src="https://cdn.jsdelivr.net/ace/1.2.4/min/ace.js"></script>
+    <script type="text/javascript" src="async.js"></script>
+    <script type="text/javascript" src="bot.js"></script>
+    <textarea id="random" type="javascript/worker" style="visibility:hidden;">
+function main(arg){
+    action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
+    var result=action[Math.floor(Math.random() *5)]
+    return result
+}
+    </textarea>
+
+
+
+</head>
+
+<body>
+
+
+    <div id="preview" class="markdown-body">
+        <div class="line">
+            <div class="bloc B3 M6 S6">
+                <h1>Tank War</h1></div>
+            <div class="bloc B1 M1 S0">
+                <p><a href="./home.html"><h4>basics</h4></a></p>
+            </div>
+            <div class="bloc B1 M1 S0">
+                <p><a href="./training.html"><h4><strong>training</strong></h4></a></p>
+            </div>
+            <div class="bloc B1 M1 S0">
+                <p><a href="./arena.html"><h4>arena</h4></a></p>
+            </div>
+            <div class="bloc B8 M4 S1"></div>
+            <div class="bloc B1 M2 S1 imageInside">
+                <p><img alt="alt text" title="Logo Title Text 1" src="rock.png"></p>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S1">
+                <hr>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <h2>Ok lets get started</h2></div>
+            <div class="bloc B1 M1 S1"></div>
+            <div class="bloc B1 M1 S1">
+                <hr>
+            </div>
+            <div class="bloc B1 M1 S1"></div>
+            <div class="bloc B9 M9 S9">
+                <ul>
+                    <li>First things you need to be confortable with: this website</li>
+                    <li>All steps are divided in two panel: the code window and the simultation window</li>
+                    <li>You write your code on the code panel, and clicking play will tun the simulation </li>
+                    <li>Your tank is green, and you are refered as <strong>rookie</strong> on the score panel. </li>
+                    <li>In this page, you will play against one or many <strong>random tanks</strong>, which choose their action at random</li>
+                </ul>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <h2><br><br>Basics</h2></div>
+            <div class="bloc B1 M1 S1"></div>
+            <div class="bloc B1 M1 S1">
+                <hr>
+            </div>
+            <div class="bloc B1 M1 S1"></div>
+        </div>
+        <div class="line">
+
+            <div class="bloc B1 M1 S1">
+                <p>Your whole IA lives in a javascript function. This fonction take an argument parameter, that encaspulate all the datas you need to know about the state of the board. The programm expects you to return a command, in the form of a string</p>
+
+                <p>Your options are:</p>
+
+                <ul>
+                    <li><strong>UP</strong> : moves the tank one case upward</li>
+                    <li><strong>DOWN</strong> : moves the tank one case downward</li>
+                    <li><strong>LEFT</strong> : moves the tank one case to the left</li>
+                    <li><strong>RIGHT</strong> : moves the tank one case to the right</li>
+                    <li><strong>SHOOT</strong> : launch a rocket in the direction you were facing</li>
+                </ul>
+            </div>
+            <div class="bloc B9 M9 S9">
+                <p>If you dont send an order or your order does not fall within one of these options, your tank will <strong>do nothing</strong>. If you send an impossible order (run over another tank or shoot when you are out of missiles), your tank will
+                    <strong>do nothing</strong>.</p>
+            </div>
+            <div class="bloc B9 M9 S9">
+                <h3>one quick exemple (click on the editor)</h3></div>
+        </div>
+
+        <div class="line">
+            <div class="bloc B1 M0 S0">
+            </div>
+            <div class="editor bloc B4 M9 S9" id="exemple1" type="javascript/worker" onClick='startGame("zoneexemple1",[editor1.getValue(),document.querySelector("#random").value],["rookie","randomBot"],"score1");'>
+function main(arg){
+    console.log(arg);
+action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
+var result=action[Math.floor(Math.random() *5)]
+return result
+}            </div>
+            <div class="bloc B4 M9 S9 imageInside" style="padding:0px; display:none;" id="zoneexemple1">
+
+            </div>
+            <div class="bloc B1 M1 S1">
+            </div>
+            <div class="bloc B9 M9 S9 imageInside">
+                <h4 id="score1"></h4>
+            </div>
+
+            <script type="text/javascript">
+                var editor1 = ace.edit("exemple1");
+                editor1.setTheme("ace/theme/monokai");
+                editor1.getSession().setMode("ace/mode/javascript");
+                var rect = document.getElementById("exemple1").getBoundingClientRect();
+                var width = window.innerWidth
+                if (width < 800) {
+                    document.getElementById("exemple1").style.height = "100px";
+
+                } else {
+                    document.getElementById("exemple1").style.height = "300px";
+                }
+            </script>
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S1">
+                <p>The behaviour in this exemple is quite simple:</p>
+
+                <ul>
+                    <li>It takes the array of possible moves</li>
+                    <li>It picks one at random</li>
+                    <li>It sends one back</li>
+                </ul>
+
+                <p>This is the random bot operation, and rookie, I expect you to do a little bette than that !</p>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <h2><br><br>Getting the data</h2></div>
+            <div class="bloc B1 M1 S1"></div>
+            <div class="bloc B1 M1 S1">
+                <hr>
+            </div>
+            <div class="bloc B1 M1 S1"></div>
+        </div>
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <p>To make the most of this little brain of yours, you will need some data to work on. At each turn, your fonction get sent some pretty usefull data! </p>
+
+                <p>The data is a javascript object, organised as followed:</p>
+            </div>
+            <div class="bloc B1 M1 S9">
+                <ul>
+                    <li>Data: object
+                        <ul>
+                            <li>BULLET : int </li>
+                            <li>HISTORY: array</li>
+                            <li>X : int</li>
+                            <li>Y : int</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="bloc B1 M1 S9">
+                <ul>
+                    <li>Ennemies : array of objects
+                        <ul>
+                            <li>DEAD: boolean</li>
+                            <li>HISTORY : array</li>
+                            <li>XDIST: int</li>
+                            <li>YDIST: int</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="bloc B1 M1 S9">
+                <ul>
+                    <li>Missiles : array of objects
+                        <ul>
+                            <li>DIR : direction</li>
+                            <li>XDIST : int </li>
+                            <li>YDIST : int</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S1">
+                <p>The easiest way for you to test it is to print it to your console. Open the devTools (F12, Ctrl + Shift + I or Cmd + Opt + I) an run the next simulation where <code>    console.log(arg);
+</code>has been added</p>
+            </div>
+        </div>
+
+        <div class="line">
+            <div class="bloc B1 M0 S0">
+            </div>
+            <div class="editor bloc B4 M9 S9" id="exemple2" type="javascript/worker" onClick='startGame("zoneexemple2",[editor2.getValue(),document.querySelector("#random").value],["rookie","randomBot"],"score2");'>
+function main(arg){
+    console.log(arg);
+action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
+var result=action[Math.floor(Math.random() *5)]
+return result
+}            </div>
+            <div class="bloc B4 M9 S9 imageInside" style="padding:0px; display:none;" id="zoneexemple2">
+
+            </div>
+            <div class="bloc B1 M1 S1">
+            </div>
+            <div class="bloc B9 M9 S9 imageInside">
+                <h4 id="score2"></h4>
+            </div>
+
+            <script type="text/javascript">
+                var editor2 = ace.edit("exemple2");
+                editor2.setTheme("ace/theme/monokai");
+                editor2.getSession().setMode("ace/mode/javascript");
+                var rect = document.getElementById("exemple2").getBoundingClientRect();
+                var width = window.innerWidth
+                if (width < 800) {
+                    document.getElementById("exemple2").style.height = "100px";
+
+                } else {
+                    document.getElementById("exemple2").style.height = "300px";
+                }
+            </script>
+        </div>
+
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <h2><br><br>Training</h2></div>
+            <div class="bloc B1 M1 S1"></div>
+            <div class="bloc B1 M1 S1">
+                <hr>
+            </div>
+            <div class="bloc B1 M1 S1"></div>
+        </div>
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <p>Well it seems like we got the basics covered! Now it's time to start training! Here you can train againt multiple opposant, so get cracking</p>
+
+
+
+
+            </div>
+        </div>
+
+        <div class="line">
+            <div class="bloc B1 M0 S0">
+            </div>
+            <div class="editor bloc B4 M9 S9" id="exemple3" type="javascript/worker" onClick='startGame("zoneexemple3",[editor3.getValue(),document.querySelector("#random").value,document.querySelector("#random").value,document.querySelector("#random").value],["rookie","randomBot1","randomBot2","randomBot3"],"score3");'>
+function main(arg){
+action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
+var result=action[Math.floor(Math.random() *5)]
+return result
+}            </div>
+            <div class="bloc B4 M9 S9 imageInside" style="padding:0px; display:none;" id="zoneexemple3">
+
+            </div>
+            <div class="bloc B1 M1 S1">
+            </div>
+            <div class="bloc B9 M9 S9 imageInside">
+                <h4 id="score3"></h4>
+            </div>
+
+            <script type="text/javascript">
+                var editor3 = ace.edit("exemple3");
+                editor3.setTheme("ace/theme/monokai");
+                editor3.getSession().setMode("ace/mode/javascript");
+                var rect = document.getElementById("exemple3").getBoundingClientRect();
+                var width = window.innerWidth
+                if (width < 800) {
+                    document.getElementById("exemple3").style.height = "100px";
+
+                } else {
+                    document.getElementById("exemple3").style.height = "300px";
+                }
+
+                function submitcode(){
+                    console.log(editor3.getValue());
+                    var result = prompt("You are a fighter now rookie. You deserve a Name!");
+                    document.getElementById("submitzone").innerHTML="Well "+result+" is going to combat! Thanks!";
+                }
+            </script>
+        </div>
+        <div class="line">
+            <div class="bloc B9 M9 S9" id="">
+                <h2 id="submitzone">Think your code is good enough to make it to the big league? Well <a onClick="submitcode()"">submit it!</a> It will be tested in battle in the arena</h2>
+            </div>
+        </div>
+
+
+        <div class="line">
+            <div class="bloc B1 M1 S1">
+                <hr>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <h5>Made by <a href="http://seed-up.io"><p>Seed-Up</p></a></h5>
+
+                <h5>2016</h5></div>
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>
