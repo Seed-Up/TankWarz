@@ -1,0 +1,11 @@
+{
+  "aliases": [
+  ],
+  "locations": [
+    {
+      "location": "/",
+      "type": "static",
+      "path": "."
+    }
+  ]
+}
