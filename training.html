@@ -1,6 +1,8 @@
 <html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="index.css" type="text/css">
     <script src="https://cdn.jsdelivr.net/ace/1.2.4/min/ace.js"></script>
     <script type="text/javascript" src="async.js"></script>
@@ -108,9 +110,26 @@ return result
             </div>
             <div class="bloc B1 M1 S1">
             </div>
-            <div class="bloc B9 M9 S9 imageInside">
-                <h4 id="score1"></h4>
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S0">
             </div>
+            <div  id="score1" style="padding:0px; display:none;"class="bloc B8 M4 S1 imageInside">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th align="center">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                    </tbody>
+                </table>
+            </div>
+            <div class="bloc B1 M1 S0">
+            </div>
+        </div>
+
 
             <script type="text/javascript">
                 var editor1 = ace.edit("exemple1");
@@ -172,8 +191,8 @@ return result
                         <ul>
                             <li>DEAD: boolean</li>
                             <li>HISTORY : array</li>
-                            <li>XDIST: int</li>
-                            <li>YDIST: int</li>
+                            <li>X: int</li>
+                            <li>Y: int</li>
                         </ul>
                     </li>
                 </ul>
@@ -183,8 +202,8 @@ return result
                     <li>Missiles : array of objects
                         <ul>
                             <li>DIR : direction</li>
-                            <li>XDIST : int </li>
-                            <li>YDIST : int</li>
+                            <li>X : int </li>
+                            <li>Y : int</li>
                         </ul>
                     </li>
                 </ul>
@@ -212,9 +231,26 @@ return result
             </div>
             <div class="bloc B1 M1 S1">
             </div>
-            <div class="bloc B9 M9 S9 imageInside">
-                <h4 id="score2"></h4>
+
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S0">
             </div>
+            <div  id="score2" style="padding:0px; display:none;"class="bloc B8 M4 S1 imageInside">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th align="center">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                    </tbody>
+                </table>
+            </div>
+            <div class="bloc B1 M1 S0">
+            </div>
+        </div>
 
             <script type="text/javascript">
                 var editor2 = ace.edit("exemple2");
@@ -264,14 +300,39 @@ return result
             </div>
             <div class="bloc B1 M1 S1">
             </div>
-            <div class="bloc B9 M9 S9 imageInside">
-                <h4 id="score3"></h4>
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S0">
             </div>
-
+            <div  id="score3" style="padding:0px; display:none;"class="bloc B8 M4 S1 imageInside">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th align="center">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                    </tbody>
+                </table>
+            </div>
+            <div class="bloc B1 M1 S0">
+            </div>
+        </div>
             <script type="text/javascript">
+            document.addEventListener("keydown", function(e) {
+                if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                    e.preventDefault();
+                    console.log("CTRL S")
+                    localStorage.setItem('code', editor3.getValue())
+                }
+            }, false);
                 var editor3 = ace.edit("exemple3");
                 editor3.setTheme("ace/theme/monokai");
                 editor3.getSession().setMode("ace/mode/javascript");
+                if(localStorage.getItem('code')!=""){
+                    editor3.setValue(localStorage.getItem('code'))
+                }
                 var rect = document.getElementById("exemple3").getBoundingClientRect();
                 var width = window.innerWidth
                 if (width < 800) {
@@ -284,13 +345,15 @@ return result
                 function submitcode(){
                     console.log(editor3.getValue());
                     var result = prompt("You are a fighter now rookie. You deserve a Name!");
+                    var email = prompt("Want to claim your bot? Enter an email adress");
+
                     document.getElementById("submitzone").innerHTML="Well "+result+" is going to combat! Thanks!";
                 }
             </script>
         </div>
         <div class="line">
             <div class="bloc B9 M9 S9" id="">
-                <h2 id="submitzone">Think your code is good enough to make it to the big league? Well <a onClick="submitcode()"">submit it!</a> It will be tested in battle in the arena</h2>
+                <h2 id="submitzone">Think your code is good enough to make it to the big league? Well <a onClick="submitcode()">submit it!</a> It will be tested in battle in the arena</h2>
             </div>
         </div>
 
@@ -302,9 +365,9 @@ return result
         </div>
         <div class="line">
             <div class="bloc B9 M9 S9">
-                <h5>Made by <a href="http://seed-up.io"><p>Seed-Up</p></a></h5>
+                <h5 style="margin-bottom:0px;">Made by <a href="http://seed-up.io"><p>Seed-Up</p></a></h5>
 
-                <h5>2016</h5></div>
+                <h5 style="margin-top:0px;">2016</h5></div>
         </div>
     </div>
 

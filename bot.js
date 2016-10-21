@@ -319,14 +319,14 @@ function constructArgs(element,botArrayUpdated,bulletArrayUpdated){
     bulletArrayUpdated.forEach(
         function(bullet) {
             if(bullet.id!=element.id){
-                args.Missiles.push({XDIST: bullet.xpos-element.xpos,YDIST:bullet.ypos-element.ypos,DIR:bullet.direction });
+                args.Missiles.push({X: bullet.xpos,Y:bullet.ypos,DIR:bullet.direction });
             }
             }
     )
     botArrayUpdated.forEach(
         function(bot) {
             if(bot.id!=element.id){
-            args.Ennemies.push({XDIST: bot.xpos,YDIST: bot.ypos,HISTORY: bot.history,DEAD:bot.dead
+            args.Ennemies.push({X: bot.xpos,Y: bot.ypos,HISTORY: bot.history,DEAD:bot.dead
             });
         }
         });
@@ -421,13 +421,22 @@ function runTick(botArray,bulletArray,scoreBoard,overName,ctx,background,caseSca
                 if(!element.dead){
                     BulletsLeft+=element.bullets
                     ContestantLeft+=1;
-                    returnHTMl+=" "+element.name+ " "+element.bullets +"<br>"
+                    returnHTMl+="<tr><td> "+element.name+ "</td><td align='center'> "+element.bullets +"</tr>"
                 }else{
-                returnHTMl+=" "+element.name+ " Dead \n" +"<br>"}
-
+                returnHTMl+="<tr><td> "+element.name+ "</td><td align='center'> Dead </tr>"
+            }
             }
         )
-        document.getElementById(scoreBoard).innerHTML=returnHTMl
+        document.getElementById(scoreBoard).innerHTML=
+        "<table>\
+            <thead>\
+                <tr>\
+                    <th>Name</th>\
+                    <th align='center'>Score</th>\
+                </tr>\
+            </thead>\
+            <tbody >"+returnHTMl+"</tbody>\
+        </table>";
 
         bulletArrayUpdated.forEach(
             function(element) {
@@ -443,13 +452,7 @@ function runTick(botArray,bulletArray,scoreBoard,overName,ctx,background,caseSca
             requestAnimationFrame(runTick.bind(null, botArrayUpdated, bulletArrayUpdated,scoreBoard,overName,ctx,background,caseScale));
         }, 1000 / 9);
 
-        }else{
-        if (ContestantLeft==1){
-            document.getElementById(scoreBoard).innerHTML= botArrayUpdated[0].name+" win"
-        }else{
-            document.getElementById(scoreBoard).innerHTML="draw"
         }
-    }
     })
 
 
@@ -468,6 +471,8 @@ function startGame(zone,codeArray,nameArray,score){
     background.src = "./src/back.png";
     DrawZone=document.getElementById(zone)
     DrawZone.style.display="block";
+    scoreZone=document.getElementById(score)
+    scoreZone.style.display="block";
     DrawZone.removeChild(DrawZone.firstChild);
     DrawZone.appendChild(canvas);
     var rect = canvas.parentNode.getBoundingClientRect();
