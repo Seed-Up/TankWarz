@@ -297,6 +297,7 @@ function missileCollison(bulletArray,botArray){
     for (b = 0; b < botArray.length; b++) {
         if ( arraysEqual(bulletArray[a].getPos(), botArray[b].getPos()) && bulletArray[a].id!=botArray[b].id )  {
             returnBotArray[b].dead=true;
+            returnBotArray[b].kill();
             returnBulletArray.splice(a, 1);
         }
     }
