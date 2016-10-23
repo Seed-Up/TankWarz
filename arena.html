@@ -1,0 +1,249 @@
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="index.css" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="async.js"></script>
+    <script type="text/javascript" src="bot.js"></script>
+    <textarea id="random" type="javascript/worker" style="visibility:hidden;">
+function main(arg){
+    action=["LEFT","RIGHT","UP","DOWN","SHOOT"]
+    var result=action[Math.floor(Math.random() *5)]
+    return result
+}
+    </textarea>
+
+</head>
+
+<body>
+
+    <div id="preview" class="markdown-body">
+        <div class="line">
+            <div class="bloc B3 M6 S6">
+                <h1>Tank War</h1></div>
+            <div class="bloc B1 M1 S0">
+                <p>
+                    <a href="./home.html"></a>
+                </p>
+                <h4><a href="./home.html">basics</a></h4>
+                <p></p>
+            </div>
+            <div class="bloc B1 M1 S0">
+                <p>
+                    <a href="./training.html"></a>
+                </p>
+                <h4><a href="./training.html">training</a></h4>
+                <p></p>
+            </div>
+            <div class="bloc B1 M1 S0">
+                <p>
+                    <a href="./arena.html"></a>
+                </p>
+                <h4><a href="./arena.html"><strong>arena</strong></a></h4>
+                <p></p>
+            </div>
+            <div class="bloc B8 M4 S1"></div>
+            <div class="bloc B1 M2 S1 imageInside">
+                <p><img alt="alt text" title="Logo Title Text 1" src="rock.png"></p>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S1">
+                <hr>
+            </div>
+        </div>
+
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <h2>Live Arena</h2>
+            </div>
+        </div>
+
+
+        <div class="line" >
+
+
+            <div class="bloc B1 M1 S0">
+            </div>
+
+            <div class="bloc B4 M5 S1 imageInside" style="padding:0px; display:none; " id="zoneexemple1">
+            </div>
+            <div class="bloc B1 M1 S0">
+            </div>
+
+
+        </div>
+        <div class="line" >
+            <div class="bloc B1 M1 S0">
+            </div>
+        <div  style="padding:0px"class="bloc B4 M5 S1 imageInside">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th align="center">ELO</th>
+                        <th align="center">Score</th>
+                    </tr>
+                </thead>
+                <tbody id="score1" >
+                </tbody>
+            </table>
+        </div>
+        <div class="bloc B1 M1 S0">
+        </div>
+        </div>
+
+
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <br>
+                <br>
+                <h2>High Scores</h2>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S0">
+            </div>
+            <div class="bloc B1 M4 S1">
+                <hr>
+            </div>
+            <div class="bloc B1 M1 S0">
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B1 M1 S0">
+            </div>
+            <div class="bloc B4 M4 S1">
+                <table>            <thead>                <tr>                    <th>Name</th>                    <th align="center">ELO</th>                </tr>            </thead>            <tbody id="highscore"><tr><td> randomBot</td><td align="center"> 68</td></tr><tr><td> rookie</td><td align="center"> Dead </td></tr><tr><td> randomBot</td><td align="center"> Dead </td></tr><tr><td> randomBot</td><td align="center"> Dead </td></tr><tr><td> randomBot</td><td align="center"> Dead </td></tr><tr><td> randomBot</td><td align="center"> Dead </td></tr></tbody>        </table>
+            </div>
+            <div class="bloc B1 M1 S0">
+            </div>
+        </div>
+
+        <script>
+        var exampleSocket = new WebSocket(" ws://localhost:8002");
+        var gamestarted=false;
+        var background = new Image();
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        var inc=0;
+        var overname="";
+        var image = [new Image(),new Image(),new Image(),new Image(),new Image(),new Image(),new Image(),new Image(),new Image(),new Image()];
+        image[0].src = "./src/tank1/tank-01.png";
+        image[1].src = "./src/tank1/tank-02.png";
+        image[2].src = "./src/tank1/tank-03.png";
+        image[3].src = "./src/tank1/tank-04.png";
+        image[4].src = "./src/tank1/tank-05.png";
+        image[5].src = "./src/tank1/tankover-01.png";
+        image[6].src = "./src/tank1/tankover-02.png";
+        image[7].src = "./src/tank1/tankover-03.png";
+        image[8].src = "./src/tank1/tankover-04.png";
+        var rimage = [new Image(),new Image(),new Image(),new Image()];
+        rimage[0].src = "./src/rocket/rock1.png";
+        rimage[1].src = "./src/rocket/rock2.png";
+        rimage[2].src = "./src/rocket/rock3.png";
+        rimage[3].src = "./src/rocket/rock4.png";
+        background.src = "./src/back.png";
+
+        exampleSocket.onmessage = function (event) {
+            var data=JSON.parse(event.data);
+            if(data.status=="high-score"){
+                var returnHTMl="";
+                console.log(data);
+                data.bot.forEach(
+                    function(element) {
+                            returnHTMl+="<tr ><td> "+element.name+ "</td><td align='center'> "+element.elo +"</tr>"
+                    });
+                document.getElementById("highscore").innerHTML=returnHTMl
+            }
+            if(data.status=="ongoing"){
+                if(gamestarted==false){
+                    console.log("init");
+                    DrawZone=document.getElementById("zoneexemple1")
+                    DrawZone.style.display="block";
+                    DrawZone.removeChild(DrawZone.firstChild);
+                    DrawZone.appendChild(canvas);
+                    var rect = canvas.parentNode.getBoundingClientRect();
+                    canvas.width =rect.width
+                    canvas.height = rect.width
+                    caseScale=rect.width/30;
+                    gamestarted=true;
+                    ctx.font = caseScale*0.8+"px sans-serif";
+
+                }
+                ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+                var returnHTMl="";
+                data.botArray.forEach(
+                    function(element) {
+                        if (element.dead==true){
+                            returnHTMl+="<tr ><td> "+element.name+ "</td><td> "+element.elo+ "</td><td align='center'>DEAD</tr>"
+                            ctx.drawImage(image[4], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
+                        }else{
+                            returnHTMl+="<tr><td> "+element.name+ "</td><td> "+element.elo+ "</td><td align='center'>"+element.bullet+"</tr>"
+                            if(element.orientation=="UP"){
+                            ctx.drawImage(image[0+inc], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
+                            }
+                            if(element.orientation=="DOWN"){
+                            ctx.drawImage(image[2+inc], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
+                            }
+                            if(element.orientation=="RIGHT"){
+                            ctx.drawImage(image[3+inc], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
+                            }
+                            if(element.orientation=="LEFT"){
+                            ctx.drawImage(image[1+inc], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
+                            }
+                        }
+                        ctx.fillText(element.name,element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale);
+
+                });
+                document.getElementById("score1").innerHTML=returnHTMl
+
+                data.bulletArray.forEach(
+                    function(element) {
+
+                    if(element.direction=="UP"){
+                    ctx.drawImage(rimage[0], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
+                    }
+                    if(element.direction=="DOWN"){
+                    ctx.drawImage(rimage[1], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
+                    }
+                    if(element.direction=="RIGHT"){
+                    ctx.drawImage(rimage[3], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale, 2*caseScale, 2*caseScale);
+                    }
+                    if(element.direction=="LEFT"){
+                    ctx.drawImage(rimage[2], element.xpos*caseScale-caseScale, element.ypos*caseScale-caseScale,2* caseScale,2* caseScale);
+                    }
+
+                })
+
+
+
+
+            }
+        }
+        //startGame("zoneexemple1",[document.querySelector("#random").value,document.querySelector("#random").value,document.querySelector("#random").value,document.querySelector("#random").value,document.querySelector("#random").value,document.querySelector("#random").value],["rookie","randomBot","randomBot","randomBot","randomBot","randomBot"],"score1");
+        </script>
+
+
+
+        <div class="line">
+            <div class="bloc B1 M1 S1">
+                <hr>
+            </div>
+        </div>
+        <div class="line">
+            <div class="bloc B9 M9 S9">
+                <h5 style="margin-bottom:0px;">Made by <a href="http://seed-up.io"><p>Seed-Up</p></a></h5>
+
+                <h5 style="margin-top:0px;">2016</h5></div>
+        </div>
+    </div>
+
+
+
+
+
+
+</body>
+
+</html>

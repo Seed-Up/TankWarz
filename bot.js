@@ -97,6 +97,8 @@ class Bot {
         this.image=image;
         this.worker.onmessage = e => {
             var data = e.data;
+            clearTimeout(this.timeout);
+
 
             if (data.action === "result") {
                 this.tickCB(null, data.result);
@@ -129,7 +131,15 @@ class Bot {
 
     tick(arg,cb) {
         this.tickCB = cb;
+        if (this.dead) {
+            return cb(null, "NOP");
+        }
         this.worker.postMessage({ action: "execute", argument:arg });
+        this.timeout = setTimeout(() => {
+            this.dead = true;
+            this.kill();
+            this.tickCB(null, "NOP");
+        }, 500);
     }
 
     remainingBullet() {
@@ -371,7 +381,8 @@ function runTick(botArray,bulletArray,scoreBoard,overName,ctx,background,caseSca
 
                 botArrayUpdated[i].history.splice(10,length-10);
                 if(arr[i]=="SHOOT"){
-                    if(botArrayUpdated[i].remainingBullet()>0){
+                    if(botArrayUpdated[i].bullets>0){
+                        botArrayUpdated[i].bullets-=1;
                         bulletArrayUpdated.push(new Bullet(botArrayUpdated[i].getX(),botArrayUpdated[i].getY(),botArrayUpdated[i].getOrientation(),botArrayUpdated[i].id))
                     }
                 }

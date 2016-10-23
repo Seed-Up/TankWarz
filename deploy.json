@@ -1,11 +1,15 @@
-{
-  "aliases": [
-  ],
-  "locations": [
-    {
-      "location": "/",
-      "type": "static",
-      "path": "."
-    }
-  ]
-}
+[{
+  "location": "/",
+  "type": "static",
+  "path": "."
+}, {
+  "location": "/server",
+  "type": "nixservice",
+  "buildCmd": {
+    "cmd": "npm i"
+  },
+  "args": {
+
+    "cmd": "${pkgs.nodejs}/bin/node index.js"
+  }
+}]

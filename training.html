@@ -89,7 +89,7 @@ function main(arg){
             </div>
             <div class="bloc B9 M9 S9">
                 <p>If you dont send an order or your order does not fall within one of these options, your tank will <strong>do nothing</strong>. If you send an impossible order (run over another tank or shoot when you are out of missiles), your tank will
-                    <strong>do nothing</strong>.</p>
+                    <strong>do nothing</strong>. If your programm takes more than 500ms to answer, tour tank will <strong>explode!</strong> </p>
             </div>
             <div class="bloc B9 M9 S9">
                 <h3>one quick exemple (click on the editor)</h3></div>
@@ -344,8 +344,14 @@ return result
 
                 function submitcode(){
                     console.log(editor3.getValue());
-                    var result = prompt("You are a fighter now rookie. You deserve a Name!");
-                    var email = prompt("Want to claim your bot? Enter an email adress");
+                    var result = prompt("You are a fighter now rookie. You deserve a Name! If you want to claim your robot, use your github handle! ");
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "http://localhost:3000/newbot", true);
+                    xhr.setRequestHeader("Content-Type", "application/json");
+                    xhr.send(JSON.stringify({
+                        value: editor3.getValue(),
+                        name: result
+                    }));
 
                     document.getElementById("submitzone").innerHTML="Well "+result+" is going to combat! Thanks!";
                 }
