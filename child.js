@@ -15,7 +15,7 @@ process.on('message', function(obj) {
             var running = "main(" + JSON.stringify(data.argument) + ")";
             var result = vm.runInContext(running, context,{timeout: 500});
         } catch (e) {
-            process.send({data: { action: "error", argument: JSON.stringify(err)}});
+            process.send({data: { action: "error", argument: JSON.stringify(e)}});
             return;
         }
         process.send({ data: { action: "result", argument: result }});

@@ -3,7 +3,7 @@ var ws = require("nodejs-websocket")
 var elo = require('elo-rank')();
 var redis = require('redis');
 var bodyParser = require('body-parser')
-var async=require("async");
+var async = require("async");
 var express = require('express');
 var app = express();
 var uuid = require('node-uuid');
@@ -14,10 +14,17 @@ client.select(3, function() { /* ... */ });
 
 var maxFrame=1000;
 var currentFrame=0;
+
+var port = process.env.PORT || 8080;
+
+var origin = SERVER_ORIGIN || "http://localhost:${port}";
+
+console.log("Origin", origin);
+
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8000');
+    res.setHeader('Access-Control-Allow-Origin', origin);
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'POST');
@@ -27,8 +34,10 @@ app.use(function (req, res, next) {
 
     next();
 });
+
 app.use( bodyParser.json() );
 
+const BOTS_COUNT = 4
 
 app.post('/newbot', function (req, res) {
     console.log(req.body);
@@ -256,9 +265,11 @@ class Bullet {
 
 
 function initGame(bulletNum) {
-    score=[];
+        score=[];
+        console.log("hey");
     currentFrame=0;
     client.hgetall("botList", function (err, obj) {
+        console.log("hey 2");
         Object.keys(obj).forEach(function(key,index) {
             var element=JSON.parse(obj[key]);
             var object={
@@ -267,10 +278,12 @@ function initGame(bulletNum) {
             }
             score.push(object)
         });
+        console.log("hey 3");
         score.sort(function(a,b) {return (a.elo < b.elo) ? 1 : ((b.elo < a.elo) ? -1 : 0);} );
         client.hkeys("botList", function (err, replies) {
         var arr = []
-        while(arr.length < 8){
+        console.log("hey 4");
+        while(arr.length < BOTS_COUNT){
             var randomnumber=Math.ceil(Math.random()*replies.length)-1
             var found=false;
             for(var i=0;i<arr.length;i++){
@@ -281,6 +294,7 @@ function initGame(bulletNum) {
                    arr[arr.length]=replies[randomnumber];
                }
          }
+        console.log("hey 5");
          console.log("selected")
         async.map(arr, function(index, cb) {
             client.hget("botList",index,cb)
@@ -480,8 +494,8 @@ function runTick(botArray, bulletArray) {
                     score:botArrayUpdated[0].elo
                 }
                 client.hset("botList", botArrayUpdated[0].uuid, JSON.stringify(botDescriptor) , redis.print);
-                for (var i=1;i<8;i++){
-                botArrayUpdated[i].elo=parseInt((elo.updateRating(elo.getExpected(botArrayUpdated[i].elo, maxElo), 0, botArrayUpdated[i].elo)-botArrayUpdated[i].elo)/7.0)+botArrayUpdated[i].elo;
+                for (var i=1;i<BOTS_COUNT;i++){
+                botArrayUpdated[i].elo=parseInt((elo.updateRating(elo.getExpected(botArrayUpdated[i].elo, maxElo), 0, botArrayUpdated[i].elo)-botArrayUpdated[i].elo)/(BOTS_COUNT - 1))+botArrayUpdated[i].elo;
                 var botDescriptor={
                     name:botArrayUpdated[i].name,
                     code: botArrayUpdated[i].value,
@@ -509,10 +523,10 @@ var x = `function main(arg){
 
 
 client.on('connect', function() {
-    app.listen(3000, function () {
-      console.log('Example app listening on port 3000!');
+    app.listen(port, function () {
+      console.log('Example app listening on port', port);
 
     });
     server.listen(8002);
-    initGame( 100);
+    initGame(100);
 });

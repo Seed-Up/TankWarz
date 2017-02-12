@@ -1,15 +1,17 @@
 [{
   "location": "/",
   "type": "static",
-  "path": "."
+  "path": "public"
 }, {
-  "location": "/server",
+  "location": "/",
   "type": "nixservice",
   "buildCmd": {
     "cmd": "npm i"
   },
   "args": {
-
+    "environ": {
+        "SERVER_ORIGIN": "http://tankwar.seed-up.org"
+    },
     "cmd": "${pkgs.nodejs}/bin/node index.js"
   }
 }]
