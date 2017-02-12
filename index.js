@@ -1,10 +1,12 @@
 'use strict';
-var ws = require("nodejs-websocket")
+
+var ws = require("ws")
 var elo = require('elo-rank')();
 var redis = require('redis');
 var bodyParser = require('body-parser')
 var async = require("async");
 var express = require('express');
+var http = require('http');
 var app = express();
 var uuid = require('node-uuid');
 
@@ -63,29 +65,30 @@ app.post('/newbot', function (req, res) {
     });*/
 });
 
-
-
-
-
 var width=30;
 var height=30;
-
-
 var score=[];
-var server = ws.createServer(function(conn) {
-    console.log("New connection")
-    conn.sendText( JSON.stringify({status:"high-score", bot:score}))
-    conn.on("close", function(code, reason) {
-        console.log("Connection closed")
-    })
-})
 
-
-function broadcast(server, msg) {
-    server.connections.forEach(function(conn) {
-        conn.sendText(msg)
-    })
-}
+var WebSocket = require('ws');
+ 
+var server = http.createServer(app);
+var wss = new WebSocket.Server({server});
+ 
+// Broadcast to all. 
+wss.broadcast = function broadcast(data) {
+  wss.clients.forEach(function each(client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(data);
+    }
+  });
+};
+ 
+wss.on('connection', function connection(connection) {
+  console.log("ws: new client");
+  connection.on("close", function () {
+    console.log("ws: close client");
+  });
+});
 
 function compareBot(a, b) {
     if (a.dead && b.dead) {
@@ -303,7 +306,7 @@ function initGame(bulletNum) {
         }, function(err, array) {
             console.log("return",array);
             var game= [array.map((v, index) => new Bot((Math.floor(Math.random() * width)), (Math.floor(Math.random() * height)), bulletNum, JSON.parse(v).name, JSON.parse(v).code,JSON.parse(v).score,(arr[index]))), []];
-            broadcast(server, JSON.stringify({status:"high-score", bot:score}))
+            wss.broadcast(JSON.stringify({status:"high-score", bot:score}))
             setTimeout(function() {
                 runTick(game[0], game[1]);
             }, 1000 );
@@ -474,7 +477,7 @@ function runTick(botArray, bulletArray) {
         )
         //console.log(botArrayUpdated);
         currentFrame+=1;
-        broadcast(server, JSON.stringify({status:"ongoing", botArray: botArrayUpdated.map(v => v.toJSON()), bulletArray: bulletArrayUpdated }));
+        wss.broadcast(JSON.stringify({status:"ongoing", botArray: botArrayUpdated.map(v => v.toJSON()), bulletArray: bulletArrayUpdated }));
         if (BulletsLeft > 0 && ContestantLeft > 1 && currentFrame<maxFrame) {
              setTimeout(function() {
                 runTick(botArrayUpdated, bulletArrayUpdated);
@@ -482,7 +485,7 @@ function runTick(botArray, bulletArray) {
 
         }else{
             console.log("game over");
-            broadcast(server, JSON.stringify({status:"over"}));
+            wss.broadcast(server, JSON.stringify({status:"over"}));
             if(botArrayUpdated[0].bullets!=botArrayUpdated[1].bullets){
                 var winnerElo=botArrayUpdated[0].elo;
                 var loserElo=Math.max.apply(Math,botArrayUpdated.slice(1).map(function(o){return o.elo;}))
@@ -525,10 +528,9 @@ var x = `function main(arg){
 
 
 client.on('connect', function() {
-    app.listen(port, function () {
+    server.listen(port, function () {
       console.log('Example app listening on port', port);
 
     });
-    server.listen(8002);
     initGame(100);
 });
