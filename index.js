@@ -17,7 +17,7 @@ var currentFrame=0;
 
 var port = process.env.PORT || 8080;
 
-var origin = SERVER_ORIGIN || "http://localhost:${port}";
+var origin = process.env.SERVER_ORIGIN || "http://localhost:${port}";
 
 console.log("Origin", origin);
 
