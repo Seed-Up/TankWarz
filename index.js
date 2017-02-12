@@ -21,6 +21,8 @@ var origin = process.env.SERVER_ORIGIN || "http://localhost:${port}";
 
 console.log("Origin", origin);
 
+app.use('/', express.static('public'));
+
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect

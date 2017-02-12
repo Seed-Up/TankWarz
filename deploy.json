@@ -1,9 +1,5 @@
 [{
   "location": "/",
-  "type": "static",
-  "path": "public"
-}, {
-  "location": "/",
   "type": "nixservice",
   "buildCmd": {
     "cmd": "npm i"
