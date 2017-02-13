@@ -485,7 +485,7 @@ function runTick(botArray, bulletArray) {
 
         }else{
             console.log("game over");
-            wss.broadcast(server, JSON.stringify({status:"over"}));
+            wss.broadcast(JSON.stringify({status:"over"}));
             if(botArrayUpdated[0].bullets!=botArrayUpdated[1].bullets){
                 var winnerElo=botArrayUpdated[0].elo;
                 var loserElo=Math.max.apply(Math,botArrayUpdated.slice(1).map(function(o){return o.elo;}))
