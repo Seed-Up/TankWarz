@@ -121,7 +121,7 @@ function main(arg){
         </div>
 
         <script>
-        var exampleSocket = new WebSocket(" ws://localhost:8002");
+        var exampleSocket = new WebSocket("ws://"+window.location.host);
         var gamestarted=false;
         var background = new Image();
         var canvas = document.createElement("canvas");
