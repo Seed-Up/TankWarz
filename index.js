@@ -17,7 +17,7 @@ client.select(3, function() { /* ... */ });
 var maxFrame=1000;
 var currentFrame=0;
 
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 4242;
 
 var origin = process.env.SERVER_ORIGIN || "http://localhost:${port}";
 
@@ -526,6 +526,10 @@ var x = `function main(arg){
 
 //TEST
 
+
+client.on("error", function (err) {
+    console.log("Redis: Error " + err);
+});
 
 client.on('connect', function() {
     server.listen(port, function () {
